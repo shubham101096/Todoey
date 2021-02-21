@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TodoItemCell" id="CDI-6t-Y8E">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TodoItemCell" id="CDI-6t-Y8E" customClass="TodoItemTableViewCell" customModule="Todoey" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="28" width="428" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CDI-6t-Y8E" id="ELh-Xw-wVJ">
@@ -31,7 +31,14 @@
                             <outlet property="delegate" destination="yrE-Ce-3RK" id="glF-qL-YV0"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="ik8-lf-22O"/>
+                    <navigationItem key="navigationItem" title="Todoey" id="ik8-lf-22O">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="x2X-og-j97">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addItemPressed:" destination="yrE-Ce-3RK" id="FRG-oo-Zb2"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="94g-77-aG7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
