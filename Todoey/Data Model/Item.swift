@@ -8,7 +8,8 @@
 
 import Foundation
 
-struct Item {
+
+struct Item: Codable {
     let item: String
     var done: Bool
     init(item: String, done: Bool = false) {
@@ -16,3 +17,4 @@ struct Item {
         self.done = done
     }
 }
+

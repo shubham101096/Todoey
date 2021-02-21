@@ -10,13 +10,16 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
         
-    var itemArray = Array(repeating: Item(item: "code"), count: 30)
+    var itemArray = Array(repeating: Item(item: "code"), count: 3)
     var alert: UIAlertController?
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        itemArray = defaults.array(forKey: "TodoListArray") as? [Item] ?? itemArray
+        print(dataFilePath)
+        loadData()
+        
+//        itemArray = defaults.array(forKey: "TodoListArray") as? [Item] ?? itemArray
 //        self.tableView.setEditing(true, animated: true)
         // Do any additional setup after loading the view.
     }
@@ -39,6 +42,7 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
                 
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        saveItems()
         tableView.reloadData()
         
 //        cell.accessor
@@ -53,7 +57,7 @@ class TodoListViewController: UITableViewController {
         let saveAction = UIAlertAction(title: "Add", style: .default) { _ in
             if let itemText = self.alert?.textFields![0].text {
                 self.itemArray.append(Item(item: itemText))
-                self.defaults.setValue(self.itemArray, forKey: "TodoListArray")
+                self.saveItems()
                 self.tableView.reloadData()
             }
         }
@@ -65,6 +69,39 @@ class TodoListViewController: UITableViewController {
         saveAction.isEnabled = false
         
         present(alert!, animated: true, completion: nil)
+    }
+    
+    func saveItems() -> Void {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: self.dataFilePath!)
+        } catch {
+            print("Error encoding itemArray: \(error)")
+        }
+    }
+    
+    func loadData() -> Void {
+        
+        if  let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error loading data: \(error)")
+            }
+        }
+        
+//        do {
+//            let data = try Data(contentsOf: dataFilePath!)
+//            let decoder = PropertyListDecoder()
+//            itemArray = try decoder.decode([Item].self, from: data)
+//        } catch {
+//            print("Error loading data: \(error)")
+//        }
+        
     }
     
     @objc func alertTextFieldDidChange(_ sender: UITextField) {
