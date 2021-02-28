@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class TodoListViewController: UITableViewController {
-        
+    
     var itemArray = [Item]()
     var alert: UIAlertController?
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -38,6 +38,8 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
         saveItems()
         self.tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -79,20 +81,48 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems() {
-        let request :NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest() ) {
         do {
             itemArray = try context.fetch(request)
+            tableView.reloadData()
         } catch {
             print("Error loading items: \(error)")
         }
-        
-        
     }
     
     @objc func alertTextFieldDidChange(_ sender: UITextField) {
         alert?.actions[0].isEnabled = sender.text!.isEmpty ? false : true
     }
+}
+
+extension TodoListViewController: UISearchBarDelegate {
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        request.predicate = predicate
+        request.sortDescriptors = [sortDescriptor]
+        loadItems(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+        }
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.setShowsCancelButton(true, animated: true)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        loadItems()
+        DispatchQueue.main.async {
+            searchBar.setShowsCancelButton(false, animated: true)
+            searchBar.text = ""
+            searchBar.resignFirstResponder()
+        }
+    }
 }
 
