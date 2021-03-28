@@ -14,11 +14,15 @@ class TodoListViewController: UITableViewController {
     var itemArray = [Item]()
     var alert: UIAlertController?
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var selectedCategory: Category? {
+        didSet {
+            loadItems()
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        loadItems()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -43,6 +47,15 @@ class TodoListViewController: UITableViewController {
         saveItems()
         self.tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return UISwipeActionsConfiguration(actions: [UIContextualAction(style: .destructive, title: "Remove", handler: { (_, _, _) in
+            self.context.delete(self.itemArray[indexPath.row])
+            self.itemArray.remove(at: indexPath.row)
+            self.saveItems()
+        })])
+    }
+    
     @IBAction func addItemPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
         alert = UIAlertController(title: "Add", message: "Enter item", preferredStyle: .alert)
@@ -56,6 +69,7 @@ class TodoListViewController: UITableViewController {
                 let newItem = Item(context: self.context)
                 newItem.title = itemText
                 newItem.done = false
+                newItem.parentCategory = self.selectedCategory
                 self.itemArray.append(newItem)
                 self.saveItems()
             }
@@ -82,6 +96,14 @@ class TodoListViewController: UITableViewController {
     }
     
     func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest() ) {
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory?.name)!)
+        if let searchPredicate = request.predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [searchPredicate, categoryPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+
         do {
             itemArray = try context.fetch(request)
             tableView.reloadData()
