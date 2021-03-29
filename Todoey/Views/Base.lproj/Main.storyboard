@@ -60,7 +60,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <textInputTraits key="textInputTraits"/>
                             <connections>
-                                <outlet property="delegate" destination="yrE-Ce-3RK" id="Iqt-sB-dcb"/>
+                                <outlet property="delegate" destination="yrE-Ce-3RK" id="Y3c-lm-Ttb"/>
                             </connections>
                         </searchBar>
                         <prototypes>
