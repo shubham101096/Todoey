@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
-class CategoryTableViewController: UITableViewController {
+class CategoryTableViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     var categoryArray: Results<Category>?
@@ -27,8 +28,9 @@ class CategoryTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet."
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet"
+        
         return cell
     }
     
@@ -89,9 +91,22 @@ class CategoryTableViewController: UITableViewController {
             categoryArray = realm.objects(Category.self)
             tableView.reloadData()
     }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        if let category = categoryArray?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(category)
+                }
+            } catch {
+                print("Error deleting category \(error)")
+            }
+        }
+    }
+    
 }
 
-//MARK: Text field delegates
+//MARK: - Text field delegates
 
 extension CategoryTableViewController: UITextFieldDelegate {
     @objc func alertTextFieldDidChange(_ sender: UITextField) {

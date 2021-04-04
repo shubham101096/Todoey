@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     var itemArray: Results<Item>?
@@ -22,7 +22,6 @@ class TodoListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -30,7 +29,7 @@ class TodoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         let item = itemArray?[indexPath.row]
         cell.textLabel?.text = item?.title ?? "No item added yet"
@@ -112,6 +111,19 @@ class TodoListViewController: UITableViewController {
     func loadItems() {
             itemArray = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
             tableView.reloadData()
+    }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        if let item = self.itemArray?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(item)
+                }
+                
+            } catch {
+                print("Error deleting item \(error)")
+            }
+        }
     }
     
     @objc func alertTextFieldDidChange(_ sender: UITextField) {
