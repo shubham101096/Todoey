@@ -22,6 +22,17 @@ class CategoryTableViewController: SwipeTableViewController {
         loadCategories()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else {
+            return
+        }
+        
+        if let navBarColour = UIColor(hexString: "1d9bf6") {
+            navBar.backgroundColor = navBarColour
+            navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+        }
+    }
+    
     //MARK: Table View Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -30,10 +41,15 @@ class CategoryTableViewController: SwipeTableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet"
-        if let bgColor = categoryArray?[indexPath.row].bgColor {
-            cell.backgroundColor = UIColor.init(hexString: bgColor)
+        
+        if let category = categoryArray?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            guard let hexBgColor = UIColor(hexString: category.bgColor) else {fatalError()}
+            cell.backgroundColor = hexBgColor
+            cell.textLabel?.textColor = ContrastColorOf(hexBgColor, returnFlat: true)
+
         }
+
         return cell
     }
     

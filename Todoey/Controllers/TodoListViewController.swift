@@ -20,9 +20,23 @@ class TodoListViewController: SwipeTableViewController {
             loadItems()
         }
     }
-
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else {
+            return
+        }
+        navBar.backgroundColor = UIColor.init(hexString: selectedCategory!.bgColor)
+        title = selectedCategory?.name
+        if let navBarColor =  UIColor.init(hexString: selectedCategory!.bgColor){
+            searchBar.barTintColor = navBarColor
+            navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+            navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColor, returnFlat: true) ]
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
