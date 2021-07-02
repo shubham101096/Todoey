@@ -19,10 +19,10 @@ class CategoryTableViewController: SwipeTableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadCategories()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        loadCategories()
         guard let navBar = navigationController?.navigationBar else {
             return
         }
